@@ -1,4 +1,4 @@
-package dev.tingh;
+package dev.tingh.trading;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,7 +89,7 @@ public class OrderBuilder {
         return this;
     }
 
-    Map<String, Object> build() {
+    public Map<String, Object> build() {
         return new HashMap<>(params);
     }
 }

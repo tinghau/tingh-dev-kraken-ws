@@ -1,6 +1,10 @@
-package dev.tingh;
+package dev.tingh.client;
 
 import com.google.gson.Gson;
+import dev.tingh.trading.AmendOrderBuilder;
+import dev.tingh.trading.CancelAfterBuilder;
+import dev.tingh.trading.CancelOrderBuilder;
+import dev.tingh.trading.OrderBuilder;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -8,31 +12,11 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-public class KrakenWebSocketClient extends WebSocketClient {
+public class KrakenOrderClient extends KrakenBaseClient {
     private final Gson gson = new Gson();
 
-    public KrakenWebSocketClient(URI serverUri) {
+    public KrakenOrderClient(URI serverUri) {
         super(serverUri);
-    }
-
-    @Override
-    public void onOpen(ServerHandshake handshakedata) {
-        System.out.println("Connected to Kraken WebSocket API");
-    }
-
-    @Override
-    public void onMessage(String message) {
-        System.out.println("Received message: " + message);
-    }
-
-    @Override
-    public void onClose(int code, String reason, boolean remote) {
-        System.out.println("Connection closed: " + reason);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-        ex.printStackTrace();
     }
 
     public void sendOrder(OrderBuilder order) {
@@ -55,4 +39,12 @@ public class KrakenWebSocketClient extends WebSocketClient {
         orderMap.putAll(order.build());
         send(gson.toJson(orderMap));
     }
+
+    public void cancelAfter(CancelAfterBuilder cancelAfter) {
+        Map<String, Object> cancelAfterMap = new HashMap<>();
+        cancelAfterMap.put("event", "cancelAllOrdersAfter");
+        cancelAfterMap.putAll(cancelAfter.build());
+        send(gson.toJson(cancelAfterMap));
+    }
+
 }
