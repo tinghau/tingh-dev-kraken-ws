@@ -2,6 +2,8 @@ package dev.tingh.client;
 
 import com.google.gson.Gson;
 import dev.tingh.data.*;
+import dev.tingh.data.handler.BookDataHandler;
+import dev.tingh.data.handler.TickerDataHandler;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -11,8 +13,27 @@ public class KrakenDataClient extends KrakenBaseClient {
 
     private final Gson gson = new Gson();
 
-    public KrakenDataClient(URI serverUri) {
+    private final BookDataHandler bookDataHandler;
+    private final TickerDataHandler tickerDataHandler;
+
+
+    public KrakenDataClient(URI serverUri, String baseDirectory) {
         super(serverUri);
+        this.bookDataHandler = new BookDataHandler(baseDirectory);
+        this.tickerDataHandler = new TickerDataHandler(baseDirectory);
+    }
+
+    // Add message handler method
+    @Override
+    public void onMessage(String message) {
+        if (message.contains("\"type\":") &&
+                (message.contains("\"ticker\"") || message.contains("\"ticker_snapshot\""))) {
+            tickerDataHandler.handleTickerData(message);
+        } else if (message.contains("\"type\":") &&
+                (message.contains("\"book\"") || message.contains("\"book_snapshot\""))) {
+            bookDataHandler.handleBookData(message);
+        }
+        // Handle other message types...
     }
 
     public void subscribeToTicker(TickerSubscriptionBuilder subscription) {
