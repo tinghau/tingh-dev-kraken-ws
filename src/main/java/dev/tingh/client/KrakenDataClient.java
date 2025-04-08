@@ -2,8 +2,7 @@ package dev.tingh.client;
 
 import com.google.gson.Gson;
 import dev.tingh.data.*;
-import dev.tingh.data.handler.BookDataHandler;
-import dev.tingh.data.handler.TickerDataHandler;
+import dev.tingh.data.handler.*;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -14,13 +13,18 @@ public class KrakenDataClient extends KrakenBaseClient {
     private final Gson gson = new Gson();
 
     private final BookDataHandler bookDataHandler;
+    private final Level3DataHandler level3DataHandler;
+    private final OhlcDataHandler ohlcDataHandler;
     private final TickerDataHandler tickerDataHandler;
-
+    private final TradeDataHandler tradeDataHandler;
 
     public KrakenDataClient(URI serverUri, String baseDirectory) {
         super(serverUri);
         this.bookDataHandler = new BookDataHandler(baseDirectory);
+        this.level3DataHandler = new Level3DataHandler(baseDirectory);
+        this.ohlcDataHandler = new OhlcDataHandler(baseDirectory);
         this.tickerDataHandler = new TickerDataHandler(baseDirectory);
+        this.tradeDataHandler = new TradeDataHandler(baseDirectory);
     }
 
     // Add message handler method
@@ -32,10 +36,18 @@ public class KrakenDataClient extends KrakenBaseClient {
         } else if (message.contains("\"type\":") &&
                 (message.contains("\"book\"") || message.contains("\"book_snapshot\""))) {
             bookDataHandler.handleBookData(message);
+        } else if (message.contains("\"type\":") &&
+                (message.contains("\"level3\"") || message.contains("\"level3_snapshot\""))) {
+            level3DataHandler.handleLevel3Data(message);
+        } else if (message.contains("\"type\":") &&
+                (message.contains("\"ohlc\"") || message.contains("\"ohlc_snapshot\""))) {
+            ohlcDataHandler.handleOhlcData(message);
+        } else if (message.contains("\"type\":") &&
+                (message.contains("\"trade\"") || message.contains("\"trade_snapshot\""))) {
+            tradeDataHandler.handleTradeData(message);
         }
         // Handle other message types...
     }
-
     public void subscribeToTicker(TickerSubscriptionBuilder subscription) {
         Map<String, Object> subscriptionMap = new HashMap<>();
         subscriptionMap.put("method", "subscribe");

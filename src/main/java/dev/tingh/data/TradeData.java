@@ -5,7 +5,7 @@ import java.util.List;
 public class TradeData {
     private String channel;
     private String type;
-    private List<TradeItem> data;
+    private List<Trade> data;
 
     public String getChannel() {
         return channel;
@@ -15,11 +15,11 @@ public class TradeData {
         return type;
     }
 
-    public List<TradeItem> getData() {
+    public List<Trade> getTrades() {
         return data;
     }
 
-    public static class TradeItem {
+    public static class Trade {
         private String price;
         private String volume;
         private String timestamp;
@@ -48,7 +48,7 @@ public class TradeData {
             return orderType;
         }
 
-        public String getMisc() {
+        public String getTradeId() {
             return misc;
         }
 

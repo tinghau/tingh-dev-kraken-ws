@@ -3,8 +3,21 @@ package dev.tingh.data;
 import java.util.List;
 
 public class OhlcData {
+    private String channel;
     private String type;
     private List<OhlcSymbolData> data;
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public List<OhlcSymbolData> getData() {
+        return data;
+    }
 
     public static class OhlcSymbolData {
         private String symbol;
@@ -20,13 +33,30 @@ public class OhlcData {
     }
 
     public static class OhlcDetails {
+        private String interval;
+        private List<Candle> candles;
+
+        public String getInterval() {
+            return interval;
+        }
+
+        public List<Candle> getCandles() {
+            return candles;
+        }
+    }
+
+    public static class Candle {
+        private String timestamp;
         private String open;
         private String high;
         private String low;
         private String close;
         private String volume;
-        private long timestamp;
-        private String interval;
+        private String trades;
+
+        public String getTimestamp() {
+            return timestamp;
+        }
 
         public String getOpen() {
             return open;
@@ -48,20 +78,8 @@ public class OhlcData {
             return volume;
         }
 
-        public long getTimestamp() {
-            return timestamp;
+        public String getTrades() {
+            return trades;
         }
-
-        public String getInterval() {
-            return interval;
-        }
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public List<OhlcSymbolData> getData() {
-        return data;
     }
 }
