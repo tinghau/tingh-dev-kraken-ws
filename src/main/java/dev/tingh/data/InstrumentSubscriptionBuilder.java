@@ -11,6 +11,7 @@ public class InstrumentSubscriptionBuilder {
 
     public InstrumentSubscriptionBuilder(String... symbols) {
         this.symbols = Arrays.asList(symbols);
+        params.put("channel", "instrument");
     }
 
     /**
@@ -28,7 +29,6 @@ public class InstrumentSubscriptionBuilder {
 
     public Map<String, Object> build() {
         Map<String, Object> subscription = new HashMap<>();
-        subscription.put("channel", "instrument");
         subscription.put("symbol", symbols);
 
         if (!params.isEmpty()) {
