@@ -40,6 +40,7 @@ public class TickerDataHandler {
     }
 
     public void handleTickerData(String jsonData) {
+        logger.info("Received ticker data: {}", jsonData);
         try {
             TickerData tickerData = gson.fromJson(jsonData, TickerData.class);
 

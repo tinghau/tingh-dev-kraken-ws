@@ -3,12 +3,16 @@ package dev.tingh.client;
 import com.google.gson.Gson;
 import dev.tingh.data.*;
 import dev.tingh.data.handler.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
 public class KrakenDataClient extends KrakenBaseClient {
+
+    private static Logger logger = LoggerFactory.getLogger(KrakenDataClient.class);
 
     private final Gson gson = new Gson();
 
@@ -30,6 +34,8 @@ public class KrakenDataClient extends KrakenBaseClient {
     // Add message handler method
     @Override
     public void onMessage(String message) {
+        logger.info("Received message: {}", message);
+
         if (message.contains("\"type\":") &&
                 (message.contains("\"ticker\"") || message.contains("\"ticker_snapshot\""))) {
             tickerDataHandler.handleTickerData(message);

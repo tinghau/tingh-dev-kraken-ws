@@ -5,8 +5,6 @@ import dev.tingh.trading.AmendOrderBuilder;
 import dev.tingh.trading.CancelAfterBuilder;
 import dev.tingh.trading.CancelOrderBuilder;
 import dev.tingh.trading.OrderBuilder;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.util.HashMap;
