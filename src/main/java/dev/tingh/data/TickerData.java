@@ -8,44 +8,32 @@ public class TickerData {
 
     public static class TickerSymbolData {
         private String symbol;
-        private TickerDetails ticker;
+        private String askPrice;
+        private String askVolume;
+        private String bidPrice;
+        private String bidVolume;
+        private String closePrice;
+        private String highPrice;
+        private String lowPrice;
+        private String openPrice;
+        private String vwap;
+        private String numberOfTrades;
+        private String volume;
 
         public String getSymbol() {
             return symbol;
         }
-
-        public TickerDetails getTicker() {
-            return ticker;
-        }
-    }
-
-    public static class TickerDetails {
-        private String a;    // Ask price
-        private String ap;   // Ask price (deprecated)
-        private String av;   // Ask volume
-        private String b;    // Bid price
-        private String bp;   // Bid price (deprecated)
-        private String bv;   // Bid volume
-        private String c;    // Close price
-        private String h;    // High price
-        private String l;    // Low price
-        private String o;    // Open price
-        private String p;    // Volume weighted average price
-        private String t;    // Number of trades
-        private String v;    // Volume
-
-        // Getters
-        public String getAskPrice() { return a; }
-        public String getAskVolume() { return av; }
-        public String getBidPrice() { return b; }
-        public String getBidVolume() { return bv; }
-        public String getClosePrice() { return c; }
-        public String getHighPrice() { return h; }
-        public String getLowPrice() { return l; }
-        public String getOpenPrice() { return o; }
-        public String getVwap() { return p; }
-        public String getNumberOfTrades() { return t; }
-        public String getVolume() { return v; }
+        public String getAskPrice() { return askPrice; }
+        public String getAskVolume() { return askVolume; }
+        public String getBidPrice() { return bidPrice; }
+        public String getBidVolume() { return bidVolume; }
+        public String getClosePrice() { return closePrice; }
+        public String getHighPrice() { return highPrice; }
+        public String getLowPrice() { return lowPrice; }
+        public String getOpenPrice() { return openPrice; }
+        public String getVwap() { return vwap; }
+        public String getNumberOfTrades() { return numberOfTrades; }
+        public String getVolume() { return volume; }
     }
 
     public String getType() {

@@ -60,9 +60,8 @@ public class TickerDataHandler {
     private void writeTickerDataToCsv(TickerData.TickerSymbolData symbolData, String updateType) {
         LocalDate today = LocalDate.now();
         String symbol = symbolData.getSymbol();
-        TickerData.TickerDetails ticker = symbolData.getTicker();
 
-        if (ticker == null) {
+        if (symbol == null) {
             return;
         }
 
@@ -92,17 +91,17 @@ public class TickerDataHandler {
                     timestamp,
                     symbol,
                     updateType,
-                    ticker.getAskPrice(),
-                    ticker.getAskVolume(),
-                    ticker.getBidPrice(),
-                    ticker.getBidVolume(),
-                    ticker.getClosePrice(),
-                    ticker.getHighPrice(),
-                    ticker.getLowPrice(),
-                    ticker.getOpenPrice(),
-                    ticker.getVwap(),
-                    ticker.getNumberOfTrades(),
-                    ticker.getVolume()
+                    symbolData.getAskPrice(),
+                    symbolData.getAskVolume(),
+                    symbolData.getBidPrice(),
+                    symbolData.getBidVolume(),
+                    symbolData.getClosePrice(),
+                    symbolData.getHighPrice(),
+                    symbolData.getLowPrice(),
+                    symbolData.getOpenPrice(),
+                    symbolData.getVwap(),
+                    symbolData.getNumberOfTrades(),
+                    symbolData.getVolume()
             );
 
             // Append the data to the file
