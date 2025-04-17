@@ -1,7 +1,6 @@
 package dev.tingh.data.handler;
 
 import com.google.gson.Gson;
-import dev.tingh.client.KrakenAdminClient;
 import dev.tingh.data.TickerData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,8 +79,8 @@ public class TickerDataHandler {
             // Create headers if file doesn't exist
             boolean fileExists = Files.exists(filePath);
             if (!fileExists) {
-                String headers = "timestamp,symbol,update_type,ask_price,ask_volume,bid_price,bid_volume," +
-                        "close_price,high_price,low_price,open_price,vwap,num_trades,volume\n";
+                String headers = "timestamp,symbol,update_type,bid,bid_qty,ask,ask_qty,last,volume,vwap,low,high," +
+                        "change,change_pct\n";
                 Files.writeString(filePath, headers, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             }
 
@@ -91,17 +90,17 @@ public class TickerDataHandler {
                     timestamp,
                     symbol,
                     updateType,
-                    symbolData.getAskPrice(),
-                    symbolData.getAskVolume(),
-                    symbolData.getBidPrice(),
-                    symbolData.getBidVolume(),
-                    symbolData.getClosePrice(),
-                    symbolData.getHighPrice(),
-                    symbolData.getLowPrice(),
-                    symbolData.getOpenPrice(),
+                    symbolData.getBid(),
+                    symbolData.getBidQty(),
+                    symbolData.getAsk(),
+                    symbolData.getAskQty(),
+                    symbolData.getLast(),
+                    symbolData.getVolume(),
                     symbolData.getVwap(),
-                    symbolData.getNumberOfTrades(),
-                    symbolData.getVolume()
+                    symbolData.getLow(),
+                    symbolData.getHigh(),
+                    symbolData.getChange(),
+                    symbolData.getChangePct()
             );
 
             // Append the data to the file
