@@ -40,14 +40,14 @@ public class KrakenDataClient extends KrakenBaseClient {
         
         try {
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
-            if (!jsonObject.has("type")) {
+            if (!jsonObject.has("channel")) {
                 logger.warn("Message does not contain type field: {}", message);
                 return;
             }
             
-            String type = jsonObject.get("type").getAsString();
+            String channel = jsonObject.get("channel").getAsString();
             
-            switch (type) {
+            switch (channel) {
                 case "ticker":
                     tickerDataHandler.handleTickerData(gson.fromJson(message, TickerData.class));
                     break;
@@ -64,7 +64,7 @@ public class KrakenDataClient extends KrakenBaseClient {
                     instrumentDataHandler.handleInstrumentData(gson.fromJson(message, InstrumentData.class));
                     break;
                 default:
-                    logger.warn("Unknown message type: {}", type);
+                    logger.warn("Unknown message type: {}", channel);
                     break;
             }
         } catch (Exception e) {

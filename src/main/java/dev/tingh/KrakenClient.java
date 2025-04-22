@@ -4,6 +4,7 @@ import dev.tingh.client.KrakenDataAuthClient;
 import dev.tingh.client.KrakenDataClient;
 import dev.tingh.client.KrakenUserClient;
 import dev.tingh.data.subscription.*;
+import dev.tingh.exception.ConnectException;
 import dev.tingh.user.subscription.BalanceSubscriptionBuilder;
 import dev.tingh.user.subscription.ExecutionSubscriptionBuilder;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.sleep;
 
@@ -31,37 +33,54 @@ public class KrakenClient {
         dataAuthClient = connectAuthClient();
         userClient = connectUserClient();
 
-        Thread.sleep(2000);
-
-//            subscribeToTicker(client);
-//            subscribeToBook(client);
-//        subscribeToOrders(authClient);
-//            subscribeToOhlc(client);
-//            subscribeToTrade(client);
-//            subscribeToInstrument(client);
+            subscribeToTicker();
+            subscribeToBook();
+//        subscribeToOrders();
+            subscribeToOhlc();
+            subscribeToTrade();
+            subscribeToInstrument();
 //        subscribeToBalance();
-        subscribeToExecution();
+//        subscribeToExecution();
     }
 
     private static KrakenDataClient connectClient() throws URISyntaxException {
         URI serverUri = new URI("wss://ws.kraken.com/v2"); // Kraken WebSocket URI
         KrakenDataClient client = new KrakenDataClient(serverUri, BASE_DIRECTORY);
-        client.connect();
-        return client;
+        return makeConnection(client);
+    }
+
+    private static KrakenDataClient makeConnection(KrakenDataClient client) {
+        try {
+            client.connectBlocking(10, TimeUnit.SECONDS);
+            return client;
+        } catch (InterruptedException e) {
+            logger.error("Failed to connect to Kraken WebSocket server", e);
+            throw new ConnectException(e);
+        }
     }
 
     private static KrakenDataAuthClient connectAuthClient() throws URISyntaxException {
         URI serverUri = new URI("wss://ws-auth.kraken.com/v2"); // Kraken WebSocket URI
         KrakenDataAuthClient client = new KrakenDataAuthClient(serverUri, BASE_DIRECTORY);
-        client.connect();
-        return client;
+        try {
+            client.connectBlocking(10, TimeUnit.SECONDS);
+            return client;
+        } catch (InterruptedException e) {
+            logger.error("Failed to connect to Kraken WebSocket server", e);
+            throw new ConnectException(e);
+        }
     }
 
     private static KrakenUserClient connectUserClient() throws URISyntaxException {
         URI serverUri = new URI("wss://ws-auth.kraken.com/v2"); // Kraken WebSocket URI
         KrakenUserClient client = new KrakenUserClient(serverUri, BASE_DIRECTORY);
-        client.connect();
-        return client;
+        try {
+            client.connectBlocking(10, TimeUnit.SECONDS);
+            return client;
+        } catch (InterruptedException e) {
+            logger.error("Failed to connect to Kraken WebSocket server", e);
+            throw new ConnectException(e);
+        }
     }
 
     private void subscribeToInstrument() {
