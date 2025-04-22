@@ -1,4 +1,4 @@
-package dev.tingh.admin;
+package dev.tingh.admin.subscription;
 
 import java.util.HashMap;
 import java.util.Map;

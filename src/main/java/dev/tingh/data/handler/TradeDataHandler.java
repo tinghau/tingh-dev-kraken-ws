@@ -1,7 +1,7 @@
 package dev.tingh.data.handler;
 
 import com.google.gson.Gson;
-import dev.tingh.data.TradeData;
+import dev.tingh.data.model.TradeData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,10 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -40,10 +38,19 @@ public class TradeDataHandler {
         }
     }
 
+    // Keep the old method for backward compatibility
     public void handleTradeData(String jsonData) {
         try {
             TradeData tradeData = gson.fromJson(jsonData, TradeData.class);
+            handleTradeData(tradeData);
+        } catch (Exception e) {
+            logger.error("Error processing trade data from JSON: {}", e.getMessage(), e);
+        }
+    }
 
+    // New method that accepts TradeData object
+    public void handleTradeData(TradeData tradeData) {
+        try {
             if (tradeData == null || tradeData.getTrades() == null) {
                 return;
             }
@@ -81,31 +88,23 @@ public class TradeDataHandler {
             // Create headers if file doesn't exist
             boolean fileExists = Files.exists(filePath);
             if (!fileExists) {
-                String headers = "local_timestamp,symbol,update_type,trade_timestamp,price,volume,side,order_type,trade_id\n";
+                String headers = "local_timestamp,symbol,update_type,side,price,qty,ord_type,trade_id,trade_timestamp\n";
                 Files.writeString(filePath, headers, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             }
 
             // Format the data row
             String localTimestamp = LocalDateTime.now().format(timestampFormatter);
 
-            // Convert trade timestamp to readable format
-            String tradeTimestamp = "";
-            if (trade.getTimestamp() != null && !trade.getTimestamp().isEmpty()) {
-                tradeTimestamp = Instant.ofEpochSecond(Long.parseLong(trade.getTimestamp()))
-                        .atZone(ZoneId.systemDefault())
-                        .format(timestampFormatter);
-            }
-
             String dataRow = String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
                     localTimestamp,
                     symbol,
                     updateType,
-                    tradeTimestamp,
-                    trade.getPrice(),
-                    trade.getVolume(),
                     trade.getSide(),
-                    trade.getOrderType(),
-                    trade.getTradeId()
+                    trade.getPrice(),
+                    trade.getQty(),
+                    trade.getOrdType(),
+                    trade.getTradeId(),
+                    trade.getTimestamp()
             );
 
             // Append the data to the file

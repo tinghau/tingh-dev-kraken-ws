@@ -1,4 +1,4 @@
-package dev.tingh.admin;
+package dev.tingh.admin.model;
 
 public class PongData {
     private String method;

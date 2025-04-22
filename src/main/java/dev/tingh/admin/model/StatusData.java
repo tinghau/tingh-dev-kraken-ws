@@ -1,4 +1,4 @@
-package dev.tingh.admin;
+package dev.tingh.admin.model;
 
 import java.util.List;
 

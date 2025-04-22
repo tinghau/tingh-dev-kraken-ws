@@ -6,17 +6,21 @@ import java.util.Map;
 public class CancelAfterBuilder {
     private final Map<String, Object> params = new HashMap<>();
 
-    public CancelAfterBuilder(String token, int timeout) {
+    public CancelAfterBuilder withToken(String token) {
         params.put("token", token);
-        params.put("timeout", timeout);
+        return this;
     }
 
-    public CancelAfterBuilder reqid(Integer reqid) {
-        params.put("reqid", reqid);
+    public CancelAfterBuilder withTimeout(String timeout) {
+        params.put("timeout", timeout);
         return this;
     }
 
     public Map<String, Object> build() {
-        return new HashMap<>(params);
+        Map<String, Object> cancel = new HashMap<>();
+        cancel.put("method", "cancel_all_orders_after");
+        cancel.put("params", params);
+
+        return cancel;
     }
 }

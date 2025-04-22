@@ -1,7 +1,7 @@
 package dev.tingh.data.handler;
 
 import com.google.gson.Gson;
-import dev.tingh.data.OhlcData;
+import dev.tingh.data.model.OhlcData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,10 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -40,10 +38,19 @@ public class OhlcDataHandler {
         }
     }
 
+    // Keep the old method for backward compatibility
     public void handleOhlcData(String jsonData) {
         try {
             OhlcData ohlcData = gson.fromJson(jsonData, OhlcData.class);
+            handleOhlcData(ohlcData);
+        } catch (Exception e) {
+            logger.error("Error processing OHLC data from JSON: {}", e.getMessage(), e);
+        }
+    }
 
+    // New method that accepts OhlcData object
+    public void handleOhlcData(OhlcData ohlcData) {
+        try {
             if (ohlcData == null || ohlcData.getData() == null) {
                 return;
             }
@@ -57,14 +64,8 @@ public class OhlcDataHandler {
         }
     }
 
-    private void writeOhlcDataToCsv(OhlcData.OhlcSymbolData symbolData, String updateType) {
+    private void writeOhlcDataToCsv(OhlcData.OhlcSymbolData symbolData, String updateType) throws IOException {
         LocalDate today = LocalDate.now();
-        String symbol = symbolData.getSymbol();
-        OhlcData.OhlcDetails ohlc = symbolData.getOhlc();
-
-        if (ohlc == null || ohlc.getCandles() == null || ohlc.getCandles().isEmpty()) {
-            return;
-        }
 
         try {
             fileLock.lock();
@@ -75,14 +76,14 @@ public class OhlcDataHandler {
             }
 
             // Create the file path with date-based naming, include interval in filename
-            String interval = ohlc.getInterval();
-            String fileName = symbol.replace("/", "_") + "_ohlc_" + interval + "_" + currentFileDate.format(dateFormatter) + ".csv";
+            String interval = symbolData.getInterval();
+            String fileName = symbolData.getSymbol().replace("/", "_") + "_ohlc_" + interval + "_" + currentFileDate.format(dateFormatter) + ".csv";
             Path filePath = Paths.get(baseDirectory, fileName);
 
             // Create headers if file doesn't exist
             boolean fileExists = Files.exists(filePath);
             if (!fileExists) {
-                String headers = "local_timestamp,symbol,update_type,interval,candle_timestamp,open,high,low,close,volume,trades\n";
+                String headers = "local_timestamp,symbol,update_type,open,high,low,close,trades,volume,vwap,interval_begin,interval,timestamp\n";
                 Files.writeString(filePath, headers, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             }
 
@@ -90,30 +91,21 @@ public class OhlcDataHandler {
             String localTimestamp = LocalDateTime.now().format(timestampFormatter);
             StringBuilder dataRows = new StringBuilder();
 
-            for (OhlcData.Candle candle : ohlc.getCandles()) {
-                // Convert candle timestamp to readable format
-                String candleTimestamp = "";
-                if (candle.getTimestamp() != null && !candle.getTimestamp().isEmpty()) {
-                    candleTimestamp = Instant.ofEpochSecond(Long.parseLong(candle.getTimestamp()))
-                            .atZone(ZoneId.systemDefault())
-                            .format(timestampFormatter);
-                }
-
-                dataRows.append(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
-                        localTimestamp,
-                        symbol,
-                        updateType,
-                        interval,
-                        candleTimestamp,
-                        candle.getOpen(),
-                        candle.getHigh(),
-                        candle.getLow(),
-                        candle.getClose(),
-                        candle.getVolume(),
-                        candle.getTrades()
-                ));
-            }
-
+            dataRows.append(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
+                    localTimestamp,
+                    symbolData.getSymbol(),
+                    updateType,
+                    symbolData.getOpen(),
+                    symbolData.getHigh(),
+                    symbolData.getLow(),
+                    symbolData.getClose(),
+                    symbolData.getTrades(),
+                    symbolData.getVolume(),
+                    symbolData.getVwap(),
+                    symbolData.getIntervalBegin(),
+                    symbolData.getInterval(),
+                    symbolData.getTimestamp()
+            ));
             // Append the data to the file
             Files.writeString(filePath, dataRows.toString(), StandardOpenOption.APPEND);
         } catch (IOException e) {

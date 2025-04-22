@@ -1,4 +1,4 @@
-package dev.tingh.data;
+package dev.tingh.data.model;
 
 import java.util.List;
 
@@ -7,21 +7,13 @@ public class BookData {
     private List<BookSymbolData> data;
 
     public static class BookSymbolData {
-        private String symbol;
-        private BookDetails book;
+        public String symbol;
+        private List<PriceLevel> asks;
+        private List<PriceLevel> bids;
 
         public String getSymbol() {
             return symbol;
         }
-
-        public BookDetails getBook() {
-            return book;
-        }
-    }
-
-    public static class BookDetails {
-        private List<PriceLevel> asks;
-        private List<PriceLevel> bids;
 
         public List<PriceLevel> getAsks() {
             return asks;
@@ -34,24 +26,14 @@ public class BookData {
 
     public static class PriceLevel {
         private String price;
-        private String volume;
-        private String timestamp;
-        private String updateType; // "r" (remove), "a" (add), "u" (update)
+        private String qty;
 
         public String getPrice() {
             return price;
         }
 
-        public String getVolume() {
-            return volume;
-        }
-
-        public String getTimestamp() {
-            return timestamp;
-        }
-
-        public String getUpdateType() {
-            return updateType;
+        public String getQty() {
+            return qty;
         }
     }
 

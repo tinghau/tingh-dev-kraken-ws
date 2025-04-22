@@ -1,23 +1,25 @@
 package dev.tingh.client;
 
 import com.google.gson.Gson;
-import dev.tingh.data.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dev.tingh.data.handler.*;
+import dev.tingh.data.model.*;
+import dev.tingh.data.subscription.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Map;
 
 public class KrakenDataClient extends KrakenBaseClient {
 
-    private static Logger logger = LoggerFactory.getLogger(KrakenDataClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(KrakenDataClient.class);
 
     private final Gson gson = new Gson();
 
     private final BookDataHandler bookDataHandler;
-    private final Level3DataHandler level3DataHandler;
+    private final InstrumentDataHandler instrumentDataHandler;
     private final OhlcDataHandler ohlcDataHandler;
     private final TickerDataHandler tickerDataHandler;
     private final TradeDataHandler tradeDataHandler;
@@ -25,7 +27,7 @@ public class KrakenDataClient extends KrakenBaseClient {
     public KrakenDataClient(URI serverUri, String baseDirectory) {
         super(serverUri);
         this.bookDataHandler = new BookDataHandler(baseDirectory);
-        this.level3DataHandler = new Level3DataHandler(baseDirectory);
+        this.instrumentDataHandler = new InstrumentDataHandler(baseDirectory);
         this.ohlcDataHandler = new OhlcDataHandler(baseDirectory);
         this.tickerDataHandler = new TickerDataHandler(baseDirectory);
         this.tradeDataHandler = new TradeDataHandler(baseDirectory);
@@ -35,64 +37,58 @@ public class KrakenDataClient extends KrakenBaseClient {
     @Override
     public void onMessage(String message) {
         logger.info("Received message: {}", message);
-
-        if (message.contains("\"type\":") &&
-                (message.contains("\"ticker\"") || message.contains("\"ticker_snapshot\""))) {
-            tickerDataHandler.handleTickerData(message);
-        } else if (message.contains("\"type\":") &&
-                (message.contains("\"book\"") || message.contains("\"book_snapshot\""))) {
-            bookDataHandler.handleBookData(message);
-        } else if (message.contains("\"type\":") &&
-                (message.contains("\"level3\"") || message.contains("\"level3_snapshot\""))) {
-            level3DataHandler.handleLevel3Data(message);
-        } else if (message.contains("\"type\":") &&
-                (message.contains("\"ohlc\"") || message.contains("\"ohlc_snapshot\""))) {
-            ohlcDataHandler.handleOhlcData(message);
-        } else if (message.contains("\"type\":") &&
-                (message.contains("\"trade\"") || message.contains("\"trade_snapshot\""))) {
-            tradeDataHandler.handleTradeData(message);
+        
+        try {
+            JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+            if (!jsonObject.has("type")) {
+                logger.warn("Message does not contain type field: {}", message);
+                return;
+            }
+            
+            String type = jsonObject.get("type").getAsString();
+            
+            switch (type) {
+                case "ticker":
+                    tickerDataHandler.handleTickerData(gson.fromJson(message, TickerData.class));
+                    break;
+                case "book":
+                    bookDataHandler.handleBookData(gson.fromJson(message, BookData.class));
+                    break;
+                case "ohlc":
+                    ohlcDataHandler.handleOhlcData(gson.fromJson(message, OhlcData.class));
+                    break;
+                case "trade":
+                    tradeDataHandler.handleTradeData(gson.fromJson(message, TradeData.class));
+                    break;
+                case "instrument":
+                    instrumentDataHandler.handleInstrumentData(gson.fromJson(message, InstrumentData.class));
+                    break;
+                default:
+                    logger.warn("Unknown message type: {}", type);
+                    break;
+            }
+        } catch (Exception e) {
+            logger.error("Error processing message: {}", e.getMessage(), e);
         }
-        // Handle other message types...
     }
+
     public void subscribeToTicker(TickerSubscriptionBuilder subscription) {
-        Map<String, Object> subscriptionMap = new HashMap<>();
-        subscriptionMap.put("method", "subscribe");
-        subscriptionMap.putAll(subscription.build());
-        send(gson.toJson(subscriptionMap));
+        send(gson.toJson(new HashMap<>(subscription.build())));
     }
 
     public void subscribeToBook(BookSubscriptionBuilder subscription) {
-        Map<String, Object> subscriptionMap = new HashMap<>();
-        subscriptionMap.put("method", "subscribe");
-        subscriptionMap.putAll(subscription.build());
-        send(gson.toJson(subscriptionMap));
-    }
-
-    public void subscribeToLevel3(Level3SubscriptionBuilder subscription) {
-        Map<String, Object> subscriptionMap = new HashMap<>();
-        subscriptionMap.put("method", "subscribe");
-        subscriptionMap.putAll(subscription.build());
-        send(gson.toJson(subscriptionMap));
+        send(gson.toJson(new HashMap<>(subscription.build())));
     }
 
     public void subscribeToOhlc(OhlcSubscriptionBuilder subscription) {
-        Map<String, Object> subscriptionMap = new HashMap<>();
-        subscriptionMap.put("method", "subscribe");
-        subscriptionMap.putAll(subscription.build());
-        send(gson.toJson(subscriptionMap));
+        send(gson.toJson(new HashMap<>(subscription.build())));
     }
 
     public void subscribeToTrade(TradeSubscriptionBuilder subscription) {
-        Map<String, Object> subscriptionMap = new HashMap<>();
-        subscriptionMap.put("method", "subscribe");
-        subscriptionMap.putAll(subscription.build());
-        send(gson.toJson(subscriptionMap));
+        send(gson.toJson(new HashMap<>(subscription.build())));
     }
 
     public void subscribeToInstrument(InstrumentSubscriptionBuilder subscription) {
-        Map<String, Object> subscriptionMap = new HashMap<>();
-        subscriptionMap.put("method", "subscribe");
-        subscriptionMap.putAll(subscription.build());
-        send(gson.toJson(subscriptionMap));
+        send(gson.toJson(new HashMap<>(subscription.build())));
     }
 }

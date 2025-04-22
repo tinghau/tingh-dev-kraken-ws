@@ -1,23 +1,18 @@
-package dev.tingh.data;
+package dev.tingh.data.subscription;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class OhlcSubscriptionBuilder {
+public class BookSubscriptionBuilder {
     private final Map<String, Object> params = new HashMap<>();
 
-    public OhlcSubscriptionBuilder(String... symbols) {
-        params.put("channel", "ohlc");
+    public BookSubscriptionBuilder(String... symbols) {
+        params.put("channel", "book");
         params.put("symbol", symbols);
     }
 
-    public OhlcSubscriptionBuilder withReqId(Integer reqId) {
-        params.put("req_id", reqId);
-        return this;
-    }
-
-    public OhlcSubscriptionBuilder interval(int interval) {
-        params.put("interval", interval);
+    public BookSubscriptionBuilder withDepth(int depth) {
+        params.put("depth", depth);
         return this;
     }
 

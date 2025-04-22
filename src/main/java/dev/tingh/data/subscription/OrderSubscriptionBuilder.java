@@ -1,12 +1,12 @@
-package dev.tingh.data;
+package dev.tingh.data.subscription;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Level3SubscriptionBuilder {
+public class OrderSubscriptionBuilder {
     private final Map<String, Object> params = new HashMap<>();
 
-    public Level3SubscriptionBuilder(String... symbols) {
+    public OrderSubscriptionBuilder(String... symbols) {
         params.put("channel", "level3");
         params.put("symbol", symbols);
     }
@@ -16,7 +16,7 @@ public class Level3SubscriptionBuilder {
      * @param limit valid values: 1-1000, default: 100
      * @return this builder
      */
-    public Level3SubscriptionBuilder withDepth(int limit) {
+    public OrderSubscriptionBuilder withDepth(int limit) {
         if (limit < 1 || limit > 1000) {
             throw new IllegalArgumentException("Limit must be between 1 and 1000");
         }
@@ -24,7 +24,7 @@ public class Level3SubscriptionBuilder {
         return this;
     }
 
-    public Level3SubscriptionBuilder withToken(String token) {
+    public OrderSubscriptionBuilder withToken(String token) {
         params.put("token", token);
         return this;
     }

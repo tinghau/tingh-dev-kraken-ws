@@ -1,46 +1,55 @@
 package dev.tingh.client;
 
 import com.google.gson.Gson;
-import dev.tingh.user.BalancesSubscriptionBuilder;
-import dev.tingh.user.ExecutionsSubscriptionBuilder;
+import dev.tingh.AuthTokens;
+import dev.tingh.user.subscription.BalanceSubscriptionBuilder;
+import dev.tingh.user.subscription.ExecutionSubscriptionBuilder;
+import dev.tingh.user.handler.BalanceDataHandler;
+import dev.tingh.user.handler.ExecutionDataHandler;
+import dev.tingh.user.model.BalanceData;
+import dev.tingh.user.model.ExecutionData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Map;
 
 public class KrakenUserClient extends KrakenBaseClient {
 
+    private static final Logger logger = LoggerFactory.getLogger(KrakenUserClient.class);
+
+
+    private final AuthTokens authTokens = new AuthTokens();
     private final Gson gson = new Gson();
 
-    public KrakenUserClient(URI serverUri, String apiKey, String apiSecret) {
+    private final BalanceDataHandler balanceDataHandler;
+    private final ExecutionDataHandler executionDataHandler;
+
+    public KrakenUserClient(URI serverUri, String baseDirectory) {
         super(serverUri);
-        authenticate(apiKey, apiSecret);
+
+        this.balanceDataHandler = new BalanceDataHandler(baseDirectory);
+        this.executionDataHandler = new ExecutionDataHandler(baseDirectory);
     }
 
-    private void authenticate(String apiKey, String apiSecret) {
-        Map<String, Object> authRequest = new HashMap<>();
-        authRequest.put("method", "subscribe");
-        authRequest.put("channel", "auth");
-        authRequest.put("params", new HashMap<String, Object>() {{
-            put("name", "token");
-            put("key", apiKey);
-            put("secret", apiSecret);
-        }});
+    @Override
+    public void onMessage(String message) {
+        logger.info("Received message: {}", message);
 
-        send(gson.toJson(authRequest));
+        if (message.contains("\"type\":") && (message.contains("\"balances\""))) {
+            balanceDataHandler.handleBalancesData(gson.fromJson(message, BalanceData.class));
+        } else if (message.contains("\"type\":") && message.contains("\"executions\"")) {
+            executionDataHandler.handleExecutionData(gson.fromJson(message, ExecutionData.class));
+        }
     }
 
-    public void subscribeToExecutions(ExecutionsSubscriptionBuilder subscription) {
-        Map<String, Object> subscriptionMap = new HashMap<>();
-        subscriptionMap.put("method", "subscribe");
-        subscriptionMap.putAll(subscription.build());
-        send(gson.toJson(subscriptionMap));
+    public void subscribeToExecutions(ExecutionSubscriptionBuilder subscription) {
+        subscription.withToken(authTokens.getToken());
+        send(gson.toJson(new HashMap<>(subscription.build())));
     }
 
-    public void subscribeToBalances(BalancesSubscriptionBuilder subscription) {
-        Map<String, Object> subscriptionMap = new HashMap<>();
-        subscriptionMap.put("method", "subscribe");
-        subscriptionMap.putAll(subscription.build());
-        send(gson.toJson(subscriptionMap));
+    public void subscribeToBalances(BalanceSubscriptionBuilder subscription) {
+        subscription.withToken(authTokens.getToken());
+        send(gson.toJson(new HashMap<>(subscription.build())));
     }
 }

@@ -1,13 +1,13 @@
-package dev.tingh.data;
+package dev.tingh.data.subscription;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class TickerSubscriptionBuilder {
+public class InstrumentSubscriptionBuilder {
     private final Map<String, Object> params = new HashMap<>();
 
-    public TickerSubscriptionBuilder(String... symbols) {
-        params.put("channel", "ticker");
-        params.put("symbol", symbols);
+    public InstrumentSubscriptionBuilder() {
+        params.put("channel", "instrument");
     }
 
     public Map<String, Object> build() {

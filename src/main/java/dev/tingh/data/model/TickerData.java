@@ -1,11 +1,10 @@
-package dev.tingh.data;
+package dev.tingh.data.model;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
 public class TickerData {
-
     private String type;
     private List<TickerSymbolData> data;
 

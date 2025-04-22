@@ -1,7 +1,7 @@
 package dev.tingh.data.handler;
 
 import com.google.gson.Gson;
-import dev.tingh.data.TickerData;
+import dev.tingh.data.model.TickerData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,11 +38,20 @@ public class TickerDataHandler {
         }
     }
 
+    // Keep the old method for backward compatibility
     public void handleTickerData(String jsonData) {
         logger.info("Received ticker data: {}", jsonData);
         try {
             TickerData tickerData = gson.fromJson(jsonData, TickerData.class);
+            handleTickerData(tickerData);
+        } catch (Exception e) {
+            logger.error("Error processing ticker data from JSON: {}", e.getMessage(), e);
+        }
+    }
 
+    // New method that accepts TickerData object
+    public void handleTickerData(TickerData tickerData) {
+        try {
             if (tickerData == null || tickerData.getData() == null) {
                 return;
             }

@@ -1,31 +1,28 @@
 package dev.tingh.trading;
 
+import com.sun.source.doctree.SinceTree;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class CancelOrderBuilder {
     private final Map<String, Object> params = new HashMap<>();
 
-    public CancelOrderBuilder(String token) {
+    public CancelOrderBuilder withToken(String token) {
         params.put("token", token);
-    }
-
-    public CancelOrderBuilder orderid(String orderId) {
-        params.put("orderid", orderId);
         return this;
     }
 
-    public CancelOrderBuilder pair(String pair) {
-        params.put("pair", pair);
-        return this;
-    }
-
-    public CancelOrderBuilder userref(Integer userref) {
-        params.put("userref", userref);
+    public CancelOrderBuilder withOrderIds(String... orderIds) {
+        params.put("order_id", orderIds);
         return this;
     }
 
     public Map<String, Object> build() {
-        return new HashMap<>(params);
+        Map<String, Object> cancel = new HashMap<>();
+        cancel.put("method", "cancel_order");
+        cancel.put("params", params);
+
+        return cancel;
     }
 }

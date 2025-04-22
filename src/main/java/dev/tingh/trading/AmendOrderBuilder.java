@@ -6,42 +6,46 @@ import java.util.Map;
 public class AmendOrderBuilder {
     private final Map<String, Object> params = new HashMap<>();
 
-    public AmendOrderBuilder(String token, String orderid) {
+    public AmendOrderBuilder withToken(String token) {
         params.put("token", token);
-        params.put("orderid", orderid);
-    }
-
-    public AmendOrderBuilder price(String price) {
-        params.put("price", price);
         return this;
     }
 
-    public AmendOrderBuilder volume(String volume) {
-        params.put("volume", volume);
+    public AmendOrderBuilder withClOrdId(String clOrdId) {
+        params.put("cl_ord_id", clOrdId);
         return this;
     }
 
-    public AmendOrderBuilder oflags(String oflags) {
-        params.put("oflags", oflags);
+    public AmendOrderBuilder withLimitPrice(String limitPrice) {
+        params.put("limit_price", limitPrice);
         return this;
     }
 
-    public AmendOrderBuilder deadline(String deadline) {
+    public AmendOrderBuilder withOrderQty(String orderQty) {
+        params.put("order_qty", orderQty);
+        return this;
+    }
+
+    public AmendOrderBuilder withOrderId(String orderId) {
+        params.put("order_id", orderId);
+        return this;
+    }
+
+    public AmendOrderBuilder withDeadline(String deadline) {
         params.put("deadline", deadline);
         return this;
     }
 
-    public AmendOrderBuilder cancel_response(boolean cancelResponse) {
-        params.put("cancel_response", cancelResponse);
-        return this;
-    }
-
-    public AmendOrderBuilder validate(boolean validate) {
-        params.put("validate", validate);
+    public AmendOrderBuilder withPostOnly(boolean postOnly) {
+        params.put("post_only", postOnly);
         return this;
     }
 
     public Map<String, Object> build() {
-        return new HashMap<>(params);
+        Map<String, Object> order = new HashMap<>();
+        order.put("method", "amend_order");
+        order.put("params", params);
+
+        return order;
     }
 }

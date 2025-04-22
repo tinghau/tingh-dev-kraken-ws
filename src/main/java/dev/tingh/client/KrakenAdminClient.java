@@ -1,8 +1,8 @@
 package dev.tingh.client;
 
 import com.google.gson.Gson;
-import dev.tingh.admin.PingSubscriptionBuilder;
-import dev.tingh.admin.PongData;
+import dev.tingh.admin.subscription.PingSubscriptionBuilder;
+import dev.tingh.admin.model.PongData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

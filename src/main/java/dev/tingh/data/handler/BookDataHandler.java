@@ -1,7 +1,7 @@
 package dev.tingh.data.handler;
 
 import com.google.gson.Gson;
-import dev.tingh.data.BookData;
+import dev.tingh.data.model.BookData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,34 +43,41 @@ public class BookDataHandler {
         }
     }
 
+    // Keep the old method for backward compatibility
     public void handleBookData(String jsonData) {
         try {
             BookData bookData = gson.fromJson(jsonData, BookData.class);
+            handleBookData(bookData);
+        } catch (Exception e) {
+            logger.error("Error processing book data from JSON: {}", e.getMessage(), e);
+        }
+    }
 
+    // New method that accepts BookData object
+    public void handleBookData(BookData bookData) {
+        try {
             if (bookData == null || bookData.getData() == null) {
                 return;
             }
 
             String updateType = bookData.getType();
 
-            for (BookData.BookSymbolData symbolData : bookData.getData()) {
-                String symbol = symbolData.getSymbol();
-                BookData.BookDetails book = symbolData.getBook();
-
-                if (book == null) {
+            for (BookData.BookSymbolData bookSymbolData : bookData.getData()) {
+                if (bookSymbolData == null) {
                     continue;
                 }
+                String symbol = bookSymbolData.getSymbol();
 
                 // Get or create orderbook state for this symbol
                 OrderbookState state = orderbookStates.computeIfAbsent(symbol, s -> new OrderbookState());
 
                 // Process snapshot (replace the entire orderbook)
-                if ("book_snapshot".equals(updateType)) {
-                    processSnapshot(symbol, book, state);
+                if ("snapshot".equals(updateType)) {
+                    processSnapshot(bookSymbolData, state);
                 }
                 // Process update (merge with existing orderbook)
-                else if ("book".equals(updateType)) {
-                    processUpdate(symbol, book, state);
+                else if ("update".equals(updateType)) {
+                    processUpdate(bookSymbolData, state);
                 }
 
                 // Write the updated orderbook to CSV
@@ -81,7 +88,7 @@ public class BookDataHandler {
         }
     }
 
-    private void processSnapshot(String symbol, BookData.BookDetails book, OrderbookState state) {
+    private void processSnapshot(BookData.BookSymbolData book, OrderbookState state) {
         state.bids.clear();
         state.asks.clear();
 
@@ -98,12 +105,12 @@ public class BookDataHandler {
         }
     }
 
-    private void processUpdate(String symbol, BookData.BookDetails book, OrderbookState state) {
+    private void processUpdate(BookData.BookSymbolData book, OrderbookState state) {
         // Process bid updates
         if (book.getBids() != null) {
             for (BookData.PriceLevel level : book.getBids()) {
                 String price = level.getPrice();
-                if ("0".equals(level.getVolume())) {
+                if ("0".equals(level.getQty())) {
                     // Remove the price level
                     state.bids.remove(price);
                 } else {
@@ -117,7 +124,7 @@ public class BookDataHandler {
         if (book.getAsks() != null) {
             for (BookData.PriceLevel level : book.getAsks()) {
                 String price = level.getPrice();
-                if ("0".equals(level.getVolume())) {
+                if ("0".equals(level.getQty())) {
                     // Remove the price level
                     state.asks.remove(price);
                 } else {
@@ -214,7 +221,7 @@ public class BookDataHandler {
             if (i < levels.size()) {
                 BookData.PriceLevel level = levels.get(i);
                 sb.append(level.getPrice()).append(",")
-                        .append(level.getVolume());
+                        .append(level.getQty());
             } else {
                 sb.append(","); // Empty price and volume for missing levels
             }
