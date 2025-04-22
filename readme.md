@@ -45,8 +45,8 @@ private static final String BASE_DIRECTORY;
 
 Add the Kraken private and public API keys to AuthTokens:
 ```java
-    private static final String PUBLIC_KEY;
-    private static final String PRIVATE_KEY;
+private static final String PUBLIC_KEY;
+private static final String PRIVATE_KEY;
 ```
 
 ### Run the Application
