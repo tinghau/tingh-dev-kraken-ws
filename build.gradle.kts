@@ -1,4 +1,5 @@
 plugins {
+    id("application")
     id("java")
 }
 
@@ -21,4 +22,9 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+application {
+    applicationDefaultJvmArgs = listOf("-Xmx128m")
+    mainClass = "dev.tingh.KrakenClient"
 }

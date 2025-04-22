@@ -154,14 +154,14 @@ public class InstrumentDataHandler {
                         "qty_precision,qty_increment,price_precision,cost_precision," +
                         "marginable,has_index,cost_min,margin_initial," +
                         "position_limit_long,position_limit_short," +
-                        "tick_size,price_increment,qty_min\n";
+                        "price_increment,qty_min\n";
                 Files.writeString(filePath, headers, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             }
 
             // Format the data row
             String localTimestamp = LocalDateTime.now().format(timestampFormatter);
 
-            String dataRow = String.format("%s,%s,%s,%s,%s,%s,%d,%.8f,%d,%d,%b,%b,%.5f,%.2f,%d,%d,%.8f,%.8f,%.8f\n",
+            String dataRow = String.format("%s,%s,%s,%s,%s,%s,%d,%.8f,%d,%d,%b,%b,%.5f,%.2f,%d,%d,%.8f,%.8f\n",
                     localTimestamp,
                     updateType,
                     pair.getSymbol(),
@@ -178,7 +178,6 @@ public class InstrumentDataHandler {
                     pair.getMarginInitial(),
                     pair.getPositionLimitLong(),
                     pair.getPositionLimitShort(),
-                    pair.getTickSize(),
                     pair.getPriceIncrement(),
                     pair.getQtyMin()
             );
