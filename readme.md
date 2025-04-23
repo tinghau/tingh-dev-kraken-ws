@@ -54,3 +54,5 @@ private static final String PRIVATE_KEY;
 ```commandLine
 ./gradlew build run
 ```
+### Further
+Blog post: https://tingh.dev/2025/04/18/kraken-websockets-java-trading-client.html
